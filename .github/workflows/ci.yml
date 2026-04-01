@@ -73,6 +73,7 @@ jobs:
             - name: Upload coverage reports
               uses: codecov/codecov-action@v3
               with:
+                  directory: ./services/auth-service/coverage
                   flags: unittests
                   name: codecov-umbrella
 
@@ -93,11 +94,13 @@ jobs:
                   cd services/auth-service
                   npm ci
 
-            - run: |
+            - name: Run ESLint
+              run: |
                   cd services/auth-service
-                  npm run lint || echo "No lint script found"
+                  npm run lint
 
-            - run: |
+            - name: Run TypeScript check
+              run: |
                   cd services/auth-service
                   npx tsc --noEmit
 
@@ -118,9 +121,21 @@ jobs:
                   cd services/auth-service
                   npm ci
 
-            - run: |
+            - name: Run npm audit
+              run: |
                   cd services/auth-service
                   npm audit --audit-level moderate
+
+            - name: Run security scan
+              uses: github/super-linter/slim@v5
+              env:
+                  DEFAULT_BRANCH: main
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  VALIDATE_ALL_CODEBASE: false
+                  VALIDATE_JAVASCRIPT_ES: true
+                  VALIDATE_TYPESCRIPT_ES: true
+                  VALIDATE_JSON: true
+                  VALIDATE_YAML: true
 
     docker:
         name: Docker Build
@@ -132,12 +147,17 @@ jobs:
 
             - uses: docker/setup-buildx-action@v3
 
-            - uses: docker/build-push-action@v5
+            - name: Build Docker image
+              uses: docker/build-push-action@v5
               with:
                   context: .
                   file: ./Dockerfile
                   push: false
                   tags: notes-microservice:latest
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
+                  build-args: |
+                      NODE_ENV=production
 
     deploy-staging:
         name: Deploy to Staging
