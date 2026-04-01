@@ -167,6 +167,11 @@ jobs:
         runs-on: ubuntu-latest
         needs: [test, lint, security]
 
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: docker/setup-buildx-action@v3
+
             - name: Validate Docker context
               run: |
                   # Check if all required files exist
@@ -178,6 +183,18 @@ jobs:
                     fi
                   done
                   echo "All required files present ✅"
+
+            - name: Build Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  file: ./Dockerfile
+                  push: false
+                  tags: notes-microservice:latest
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
+                  build-args: |
+                      NODE_ENV=production
 
             - name: Test Docker image
               run: |
@@ -210,6 +227,11 @@ jobs:
         runs-on: ubuntu-latest
         needs: [docker]
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - run: echo "Deploying to production..."
 
             - name: Generate CI summary
               if: always()
