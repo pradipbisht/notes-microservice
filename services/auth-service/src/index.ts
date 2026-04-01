@@ -4,7 +4,7 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import { errorHandler } from '@shared/middleware';
+import { errorHandler } from '../../../shared/middleware';
 import authRoutes from './auth.route';
 
 dotenv.config();

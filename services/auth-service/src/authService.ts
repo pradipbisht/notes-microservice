@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { AuthTokens, JWTPayload, ServiceError } from '@shared/types';
-import { createServiceError } from '@shared/utils';
+import { AuthTokens, JWTPayload, ServiceError } from '../../../shared/types';
+import { createServiceError } from '../../../shared/utils';
 import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { StringValue } from 'ms';

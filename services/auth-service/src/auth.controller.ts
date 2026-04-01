@@ -1,5 +1,8 @@
-import { asyncHandler } from '@shared/middleware';
-import { createErrorResponse, createSuccessResponse } from '@shared/utils';
+import { asyncHandler } from '../../../shared/middleware';
+import {
+  createErrorResponse,
+  createSuccessResponse,
+} from '../../../shared/utils';
 import { Request, Response } from 'express';
 import { AuthService } from './authService';
 

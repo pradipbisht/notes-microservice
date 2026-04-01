@@ -1,4 +1,4 @@
-import { createErrorResponse } from '@shared/utils';
+import { createErrorResponse } from '../../../shared/utils';
 import { NextFunction, Request, Response } from 'express';
 import { AuthService } from './authService';
 
