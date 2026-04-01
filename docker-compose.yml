@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: notesverb-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: notesverb
+      POSTGRES_PASSWORD: notesverb123
+      POSTGRES_DB: notesverb
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U notesverb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - notesverb-network
+
+volumes:
+  postgres-data:
+
+networks:
+  notesverb-network:
+    driver: bridge
