@@ -38,11 +38,15 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: npm
-                  cache-dependency-path: services/auth-service/package-lock.json
+                  cache-dependency-path: |
+                      services/auth-service/package-lock.json
+                      shared/package-lock.json
 
             - name: Install dependencies
               run: |
-                  cd services/auth-service
+                  cd shared
+                  npm ci
+                  cd ../services/auth-service
                   npm ci
 
             - name: Setup test database
@@ -88,7 +92,16 @@ jobs:
               with:
                   node-version: "20.x"
                   cache: npm
-                  cache-dependency-path: services/auth-service/package-lock.json
+                  cache-dependency-path: |
+                      services/auth-service/package-lock.json
+                      shared/package-lock.json
+
+            - name: Install dependencies
+              run: |
+                  cd shared
+                  npm ci
+                  cd ../services/auth-service
+                  npm ci
 
             - name: Validate package.json
               run: |
@@ -102,10 +115,6 @@ jobs:
                     fi
                   done
                   echo "All required scripts present ✅"
-
-            - run: |
-                  cd services/auth-service
-                  npm ci
 
             - name: Run ESLint
               run: |
@@ -140,10 +149,14 @@ jobs:
               with:
                   node-version: "20.x"
                   cache: npm
-                  cache-dependency-path: services/auth-service/package-lock.json
+                  cache-dependency-path: |
+                      services/auth-service/package-lock.json
+                      shared/package-lock.json
 
             - run: |
-                  cd services/auth-service
+                  cd shared
+                  npm ci
+                  cd ../services/auth-service
                   npm ci
 
             - name: Run npm audit

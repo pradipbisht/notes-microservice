@@ -1,12 +1,12 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 
-import { createServiceError } from "../../../shared/utils";
-import { AuthTokens, JWTPayload, ServiceError } from "../../../shared/types";
-import prisma from "./database";
-import bcrypt from "bcryptjs";
-import jwt, { SignOptions } from "jsonwebtoken";
-import { StringValue } from "ms";
+import { AuthTokens, JWTPayload, ServiceError } from '@shared/types';
+import { createServiceError } from '@shared/utils';
+import bcrypt from 'bcryptjs';
+import jwt, { SignOptions } from 'jsonwebtoken';
+import { StringValue } from 'ms';
+import prisma from './database';
 
 export class AuthService {
   private readonly jwtSecret: string;
@@ -16,13 +16,13 @@ export class AuthService {
   private readonly bcryptRounds: number;
 
   constructor() {
-    this.jwtSecret = this.getEnv("JWT_SECRET");
-    this.jwtRefreshSecret = this.getEnv("JWT_REFRESH_SECRET");
-    this.jwtExpiresIn = this.getEnv("JWT_EXPIRES_IN") as StringValue;
+    this.jwtSecret = this.getEnv('JWT_SECRET');
+    this.jwtRefreshSecret = this.getEnv('JWT_REFRESH_SECRET');
+    this.jwtExpiresIn = this.getEnv('JWT_EXPIRES_IN') as StringValue;
     this.jwtRefreshExpiresIn = this.getEnv(
-      "JWT_REFRESH_EXPIRES_IN",
+      'JWT_REFRESH_EXPIRES_IN'
     ) as StringValue;
-    this.bcryptRounds = Number(this.getEnv("BCRYPT_ROUNDS"));
+    this.bcryptRounds = Number(this.getEnv('BCRYPT_ROUNDS'));
   }
 
   private getEnv(key: string): string {
@@ -39,7 +39,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw createServiceError("User already exists", 400);
+      throw createServiceError('User already exists', 400);
     }
 
     // ✅ FIXED bcrypt
@@ -61,13 +61,13 @@ export class AuthService {
     });
 
     if (!user) {
-      throw createServiceError("Invalid email or password", 401);
+      throw createServiceError('Invalid email or password', 401);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw createServiceError("Invalid email or password", 401);
+      throw createServiceError('Invalid email or password', 401);
     }
 
     return this.generateTokens(user.id, user.email);
@@ -75,7 +75,7 @@ export class AuthService {
 
   private async generateTokens(
     userId: string,
-    email: string,
+    email: string
   ): Promise<AuthTokens> {
     const payload = { userId, email };
 
@@ -100,7 +100,7 @@ export class AuthService {
         userId,
         token: refreshToken,
         expiresAt: new Date(
-          Date.now() + this.parseExpiry(this.jwtRefreshExpiresIn),
+          Date.now() + this.parseExpiry(this.jwtRefreshExpiresIn)
         ),
       },
     });
@@ -113,7 +113,7 @@ export class AuthService {
 
   // 🔥 helper for expiry conversion
   private parseExpiry(exp: StringValue): number {
-    const ms = require("ms");
+    const ms = require('ms');
     return ms(exp);
   }
 
@@ -131,12 +131,12 @@ export class AuthService {
       });
 
       if (!storedToken || storedToken.expiresAt < new Date()) {
-        throw createServiceError("Invalid or expired refresh token", 401);
+        throw createServiceError('Invalid or expired refresh token', 401);
       }
 
       const tokens = await this.generateTokens(
         storedToken.user.id,
-        storedToken.user.email,
+        storedToken.user.email
       );
 
       await prisma.refreshToken.delete({
@@ -148,7 +148,7 @@ export class AuthService {
       if (error instanceof ServiceError) {
         throw error;
       }
-      throw createServiceError("Invalid or expired refresh token", 401);
+      throw createServiceError('Invalid or expired refresh token', 401);
     }
   }
 
@@ -168,15 +168,15 @@ export class AuthService {
       });
 
       if (!user) {
-        throw createServiceError("User not found", 404);
+        throw createServiceError('User not found', 404);
       }
 
       return decoded;
     } catch (error) {
       if (error instanceof jwt.JsonWebTokenError) {
-        throw createServiceError("Invalid token", 401);
+        throw createServiceError('Invalid token', 401);
       }
-      throw createServiceError("Invalid or expired token", 500, error);
+      throw createServiceError('Invalid or expired token', 500, error);
     }
   }
 
@@ -192,7 +192,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw createServiceError("User not found", 404);
+      throw createServiceError('User not found', 404);
     }
 
     return user;

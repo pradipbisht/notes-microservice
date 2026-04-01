@@ -1,41 +1,41 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import * as authController from "./auth.controller";
-import { validateRequest } from "../../../shared/middleware";
-import { loginSchema, refreshTokenSchema, registerSchema } from "./validation";
-import { authenticateToken } from "./auth.middleware";
+import { validateRequest } from '@shared/middleware';
+import * as authController from './auth.controller';
+import { authenticateToken } from './auth.middleware';
+import { loginSchema, refreshTokenSchema, registerSchema } from './validation';
 
 const router = Router();
 
 // register route
 router.post(
-  "/register",
+  '/register',
   validateRequest(registerSchema),
-  authController.register,
+  authController.register
 );
 
 // login route
-router.post("/login", validateRequest(loginSchema), authController.login);
+router.post('/login', validateRequest(loginSchema), authController.login);
 
 // refresh token route
 router.post(
-  "/refresh-token",
+  '/refresh-token',
   validateRequest(refreshTokenSchema),
-  authController.refreshToken,
+  authController.refreshToken
 );
 
 // logout route
 router.post(
-  "/logout",
+  '/logout',
   validateRequest(refreshTokenSchema),
-  authController.logout,
+  authController.logout
 );
 
 // validate token route
-router.get("/validate-token", authController.validateToken);
+router.get('/validate-token', authController.validateToken);
 
 // other routes profile ,etc
-router.get("/profile", authenticateToken, authController.getProfile);
-router.delete("/profile", authenticateToken, authController.deleteAccount);
+router.get('/profile', authenticateToken, authController.getProfile);
+router.delete('/profile', authenticateToken, authController.deleteAccount);
 
 export default router;
