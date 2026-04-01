@@ -10,8 +10,12 @@ RUN npm ci && npm cache clean --force
 # 🔥 Build stage
 FROM base AS builder
 
-COPY services/auth-service/ ./
 COPY shared ../shared
+WORKDIR ../shared
+RUN npm ci && npm cache clean --force
+
+WORKDIR /app
+COPY services/auth-service/ ./
 
 # Build TypeScript
 RUN npm run build
